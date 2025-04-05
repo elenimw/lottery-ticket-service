@@ -9,5 +9,5 @@ public class LotteryTicketServiceApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(LotteryTicketServiceApplication.class, args);
 	}
-
+//Test
 }
