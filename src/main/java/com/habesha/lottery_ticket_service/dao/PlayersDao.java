@@ -1,6 +1,4 @@
-package com.habesha.lottery_ticket_service.model;
-
-import com.fasterxml.jackson.annotation.JsonTypeId;
+package com.habesha.lottery_ticket_service.dao;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -12,7 +10,7 @@ import java.util.UUID;
 @Entity
 @Data //Lombok will automatically generate getter, setter, to String
 @Table(name="players")
-public class Players {
+public class PlayersDao {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
