@@ -1,50 +1,79 @@
 package com.habesha.lottery_ticket_service.service;
 
 import com.habesha.lottery_ticket_service.dao.PlayersDao;
+import com.habesha.lottery_ticket_service.exception.LotteryException;
 import com.habesha.lottery_ticket_service.model.PlayersModel;
 import com.habesha.lottery_ticket_service.repository.PlayersRepository;
+import org.modelmapper.MappingException;
+import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Service
 public class PlayersService {
 
+    private static final Logger logger = LoggerFactory.getLogger(PlayersService.class);
+
     @Autowired
     private PlayersRepository playersRepository;
 
-   //Create a new player
-    public PlayersModel createPlayer(PlayersModel playersModel){
-   // return playersRepository.save(playersModel);
-        return null;
-    }
+    @Autowired
+    private ModelMapper modelMapper;
 
-    //Get all players
-    public List<PlayersModel> getAllPlayers(){
-       // return playersRepository.findAll();
-        return null;
-    }
+    public PlayersModel registerPlayer(PlayersModel playersModel) {
+        try {
+            // Validate input
+            if (playersModel == null) {
+                logger.error("Player data is null");
+                throw new LotteryException("Player data cannot be null");
+            }
 
-    //Get a player by ID
-    public Optional<PlayersModel> getPlayerById(UUID playerId){
-       // return playersRepository.findById(playerId);
-        return null;
-    }
+            // Check for existing email or username
+            if (playersRepository.existsByEmail(playersModel.getEmail())) {
+                logger.warn("Attempt to register with existing email: {}", playersModel.getEmail());
+                throw new LotteryException("Email already exists");
+            }
+            if (playersRepository.existsByUsername(playersModel.getUsername())) {
+                logger.warn("Attempt to register with existing username: {}", playersModel.getUsername());
+                throw new LotteryException("Username already exists");
+            }
 
-    //Update a player
-    public PlayersModel updatePlayer(UUID playerId, PlayersDao playersDao){
-        if (playersRepository.existsById(playerId)){
-            playersDao.setPlayerId(playerId);
-           // return playersRepository.save(playersDao);
+            // Set default values
+            playersModel.setCreatedAt(LocalDateTime.now());
+            if (playersModel.getBalance() == null) {
+                playersModel.setBalance(BigDecimal.ZERO);
+            }
+
+            // Map to entity
+            PlayersDao entity = modelMapper.map(playersModel, PlayersDao.class);
+
+            // Save to database
+            PlayersDao savedEntity = playersRepository.save(entity);
+            logger.info("Player registered successfully: {}", savedEntity.getPlayerId());
+
+            // Map back to DTO
+            return modelMapper.map(savedEntity, PlayersModel.class);
+        } catch (MappingException e) {
+            logger.error("Error mapping player data: {}", e.getMessage(), e);
+            throw new LotteryException("Error mapping player data: " + e.getMessage(), e);
+        } catch (DataIntegrityViolationException e) {
+            logger.error("Database constraint violation: {}", e.getMessage(), e);
+            throw new LotteryException("Database error: Duplicate entry or constraint violation", e);
+        } catch (DataAccessException e) {
+            logger.error("Database access error: {}", e.getMessage(), e);
+            throw new LotteryException("Database error: Unable to access database or table missing", e);
+        } catch (LotteryException e) {
+            throw e; // Re-throw custom exceptions
+        } catch (Exception e) {
+            logger.error("Unexpected error during player registration: {}", e.getMessage(), e);
+            throw new LotteryException("Unexpected error during player registration: " + e.getMessage(), e);
         }
-        return null;
-    }
-
-    //Delete a player
-    public void deletePlayer(UUID playerId){
-        playersRepository.deleteById(playerId);
     }
 }
