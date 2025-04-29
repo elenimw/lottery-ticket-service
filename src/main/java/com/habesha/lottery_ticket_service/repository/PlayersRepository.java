@@ -10,4 +10,5 @@ import java.util.UUID;
 public interface PlayersRepository extends JpaRepository<PlayersDao, UUID> {
     boolean existsByEmail(String email);
     boolean existsByUsername(String username);
+    Optional<PlayersDao> findByEmail(String email);
 }

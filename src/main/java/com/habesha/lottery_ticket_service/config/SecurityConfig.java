@@ -7,15 +7,16 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 public class SecurityConfig {
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/lottery/player/register").permitAll()
-                .anyRequest().authenticated()
-            )
-            .csrf(csrf -> csrf.disable()); // Disable CSRF for testing
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/lottery/login", "/lottery/login/**", "/lottery/player/register", "/lottery/player/register/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .anyRequest().authenticated()
+                )
+                .csrf(csrf -> csrf.disable()); // Disable CSRF for testing
         return http.build();
     }
+
+
 }
