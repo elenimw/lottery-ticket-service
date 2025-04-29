@@ -52,7 +52,7 @@ public class PlayersController {
             response.put("message", "Email and password are required");
             return ResponseEntity.badRequest().body(response);
         }
-//        Authentication authentication = new UsernamePasswordAuthenticationToken(
+//   Authentication authentication = new UsernamePasswordAuthenticationToken(
 //                userLoginModel.getEmail(), null, List.of(new SimpleGrantedAuthority("ROLE_USER"))
 //        );
 //        SecurityContextHolder.getContext().setAuthentication(authentication);
