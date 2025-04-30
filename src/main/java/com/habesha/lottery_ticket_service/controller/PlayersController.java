@@ -1,5 +1,6 @@
 package com.habesha.lottery_ticket_service.controller;
 
+import ch.qos.logback.core.util.StringUtil;
 import com.habesha.lottery_ticket_service.model.PlayersModel;
 import com.habesha.lottery_ticket_service.model.UserLoginModel;
 import com.habesha.lottery_ticket_service.service.PlayersService;
@@ -44,29 +45,17 @@ public class PlayersController {
     }
     @Operation(summary = "Login a player")
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@RequestBody UserLoginModel userLoginModel) {
+    public ResponseEntity<Object> login(@RequestBody UserLoginModel userLoginModel) {
         logger.info("Received login request for email: {}", userLoginModel.getEmail());
-        Map<String, String> response = new HashMap<>();
+
         if (userLoginModel.getEmail() == null || userLoginModel.getPassword() == null) {
             logger.warn("Login attempt with missing email or password");
-            response.put("message", "Email and password are required");
-            return ResponseEntity.badRequest().body(response);
+
+            return ResponseEntity.badRequest().body("Email or Password is Empty");
         }
-//   Authentication authentication = new UsernamePasswordAuthenticationToken(
-//                userLoginModel.getEmail(), null, List.of(new SimpleGrantedAuthority("ROLE_USER"))
-//        );
-//        SecurityContextHolder.getContext().setAuthentication(authentication);
-//
-     boolean isValid = playersService.login(userLoginModel.getEmail(), userLoginModel.getPassword());
-        if (isValid) {
-            response.put("message", "Login successful");
+        PlayersModel response = playersService.login(userLoginModel.getEmail(), userLoginModel.getPassword());
+
             return ResponseEntity.ok(response);
-        } else {
-            response.put("message", "Invalid email or password");
-            return ResponseEntity.badRequest().body(response);
-        }
-
-
     }
 
 }
