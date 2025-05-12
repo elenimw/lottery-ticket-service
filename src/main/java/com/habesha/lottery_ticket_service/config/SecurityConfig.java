@@ -12,7 +12,9 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/lottery/login", "/lottery/login/**", "/lottery/player/register", "/lottery/player/register/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers("/lottery/player/register", "/lottery/login").permitAll()
+                        .requestMatchers("/lottery/tickets/purchase", "/lottery/tickets/player").authenticated()
+                        .requestMatchers("/lottery/tickets/draw/**").hasRole("ADMIN").anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf.disable()); // Disable CSRF for testing
         return http.build();

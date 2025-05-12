@@ -46,6 +46,7 @@ public class PlayersService {
             }
         });
     }
+
     public PlayersModel registerPlayer(PlayersModel playersModel) {
         try {
             // Validate input
@@ -129,6 +130,7 @@ public class PlayersService {
             throw new LotteryException("Unexpected error during login", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     private boolean verifyPassword(String inputPassword, String storedPassword) throws NoSuchAlgorithmException {
         // Placeholder for secure password verification (e.g., using bcrypt or similar)
         // Implement actual password hashing/checking logic here
